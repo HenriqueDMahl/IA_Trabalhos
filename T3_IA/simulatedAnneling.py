@@ -38,7 +38,7 @@ def avaliarAleatorio(inicial,listaCNF):
     return contGeral
 
 def temperatura(i):
-    return T0*(TN/T0)**(i/N)
+    return T0*(TN/float(T0))**(i/float(N))
 
 def vizinho(lista):
     x = randrange(len(lista))
