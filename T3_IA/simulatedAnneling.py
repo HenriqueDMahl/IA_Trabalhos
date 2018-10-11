@@ -1,4 +1,6 @@
 from random import *
+from thread import start_new_thread
+import time
 import math
 import re
 
@@ -6,6 +8,9 @@ TAM = 20
 N = 250000
 T0 = 50000
 TN = 17
+listaRandomsearch = []
+lisatSA = []
+num_thread = 10
 
 def gerarRandomList(x):
     lista = []
@@ -93,17 +98,28 @@ def media_dp(lista):
     return (media,dp)
 
 
+def threads(listaCNF,id):
+    global num_thread
+    global listaRandomsearch
+    global lisatSA
+    print "Thread {} Iniciou!\n".format(id)
+    inicial = gerarRandomList(TAM)
+    print "Inical da Thread {} Terminou!\n".format(id)
+    listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
+    print "RS da Thread {} Terminou!\n".format(id)
+    lisatSA.append(( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) ))
+    num_thread -= 1
+    print "Thread {} Finalizou!\n".format(id)
+
 
 listaCNF = ler()
-listaRandomsearch = []
-lisatSA = []
 
 for i in range(10):
-    inicial = gerarRandomList(TAM)
-    listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
-    lisatSA.append(( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) ))
+    start_new_thread(threads,(listaCNF,i,))
     #Cria uma tupla com os valores do inicial e do final
 
+while num_thread > 0:
+    pass
 
 print "##### RANDOM SEARCH #####"
 print listaRandomsearch
