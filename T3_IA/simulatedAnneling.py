@@ -4,7 +4,7 @@ import re
 
 TAM = 20
 N = 250000
-T0 = 10000
+T0 = 50000
 TN = 17
 
 def gerarRandomList(x):
@@ -78,7 +78,7 @@ def simuAnne(s0,listaCNF):
             candidato = proximo
         t = temperatura(cont)
         cont += 1
-        if(t < TN or cont == N):
+        if(t < TN):
             return candidato
 
 def media_dp(lista):
@@ -94,21 +94,25 @@ def media_dp(lista):
 
 
 
-inicial = gerarRandomList(TAM)
 listaCNF = ler()
 listaRandomsearch = []
+lisatSA = []
 
 for i in range(10):
+    inicial = gerarRandomList(TAM)
     listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
+    lisatSA.append(( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) ))
     #Cria uma tupla com os valores do inicial e do final
 
 
-print "##### BUSCA CEGA #####"
+print "##### RANDOM SEARCH #####"
 print listaRandomsearch
 
 print "##### SIMULATED ANNELING #####"
-sa = ( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) )
-print sa
+print lisatSA
 
-print "##### MEDIA e DP #####"
+print "##### MEDIA e DP  RANDOM SEARCH #####"
 print media_dp(listaRandomsearch)
+
+print "##### MEDIA e DP  SIMULATED ANNELING #####"
+print media_dp(lisatSA)
