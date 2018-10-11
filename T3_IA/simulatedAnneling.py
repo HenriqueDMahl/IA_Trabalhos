@@ -4,7 +4,7 @@ import re
 
 TAM = 20
 N = 250000
-T0 = 50000
+T0 = 10000
 TN = 17
 
 def gerarRandomList(x):
@@ -22,7 +22,7 @@ def ler():
             lista.append((int(l.group(1)), int(l.group(2)), int(l.group(3))))
     return lista
 
-def avaliarAleatorio(inicial,listaCNF):
+def energia(inicial,listaCNF):
     contGeral = 0
     for cada in listaCNF:
         cont = 0
@@ -51,13 +51,27 @@ def vizinho(lista):
         novaL[x] = 1
     return novaL
 
+def randomsearch(s0,listaCNF):
+    cont = 1
+    candidato = s0
+    melhorEnergia = energia(candidato,listaCNF)
+    melhorCandidato = candidato
+    while(cont < N):
+        candidato = vizinho(candidato)
+        vizinhoE = energia(candidato,listaCNF)
+        if(melhorEnergia < vizinhoE):
+            melhorCandidato = candidato
+            melhorEnergia = vizinhoE
+        cont += 1
+    return melhorEnergia
+
 def simuAnne(s0,listaCNF):
     candidato = s0
     t = T0
     cont = 1
     while(True):
         proximo = vizinho(candidato)
-        deltaE = avaliarAleatorio(proximo,listaCNF) - avaliarAleatorio(candidato,listaCNF)
+        deltaE = energia(proximo,listaCNF) - energia(candidato,listaCNF)
         if(deltaE >= 0):
             candidato = proximo
         elif randrange(0,99) < math.e ** (-deltaE/t):
@@ -67,11 +81,34 @@ def simuAnne(s0,listaCNF):
         if(t < TN or cont == N):
             return candidato
 
+def media_dp(lista):
+    media = 0.0
+    dp = 0.0
+    for cada in lista:
+        media += (cada[1] - cada[0])/len(lista)
+        dp += ((cada[1] - cada[0])**2)/len(lista)
+    
+    dp = math.sqrt(dp)
+
+    return (media,dp)
+
+
+
 inicial = gerarRandomList(TAM)
-print inicial
-print
 listaCNF = ler()
-print avaliarAleatorio(inicial,listaCNF)
-sa = simuAnne(inicial,listaCNF)
+listaRandomsearch = []
+
+for i in range(10):
+    listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
+    #Cria uma tupla com os valores do inicial e do final
+
+
+print "##### BUSCA CEGA #####"
+print listaRandomsearch
+
+print "##### SIMULATED ANNELING #####"
+sa = ( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) )
 print sa
-print avaliarAleatorio(sa,listaCNF)
+
+print "##### MEDIA e DP #####"
+print media_dp(listaRandomsearch)
