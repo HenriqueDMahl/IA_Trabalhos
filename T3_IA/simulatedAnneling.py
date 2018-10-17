@@ -68,6 +68,7 @@ def vizinho(lista):
     return novaL
 
 def randomsearch(s0,listaCNF):
+    global listaRSItens
     cont = 1
     candidato = s0
     melhorEnergia = energia(candidato,listaCNF)
@@ -86,6 +87,7 @@ def randomsearch(s0,listaCNF):
     return melhorEnergia
 
 def simuAnne(s0,listaCNF):
+    global listaSAItens
     candidato = s0
     t = T0
     cont = 1
@@ -134,9 +136,9 @@ for i in range(1):
     print lisatSA
 
     print "##### MEDIA e DP  RANDOM SEARCH #####"
-    print media_dp(listaRandomsearch)
+    print media_dp(listaRSItens)
 
     print "##### MEDIA e DP  SIMULATED ANNELING #####"
-    print media_dp(lisatSA)
+    print media_dp(listaSAItens)
 
-    
+    plotGraph(listaRSItens,'TESTE')
