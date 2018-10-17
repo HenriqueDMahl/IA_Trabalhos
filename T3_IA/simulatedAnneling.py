@@ -1,5 +1,6 @@
 from random import *
 from thread import start_new_thread
+import matplotlib.pyplot as plt
 import time
 import math
 import re
@@ -8,9 +9,19 @@ TAM = 20
 N = 250000
 T0 = 50000
 TN = 17
+listaRSItens = []
+listaSAItens = []
 listaRandomsearch = []
 lisatSA = []
 num_thread = 10
+
+def plotGraph(lista,titulo):
+    plt.plot(lista)
+    # plt.plot(results)
+    plt.grid(True)
+    plt.ylabel(titulo)
+    plt.show()
+    # plt.savefig(FILE_NAME + '-' + str(finalResuls) + '.png')
 
 def gerarRandomList(x):
     lista = []
@@ -61,19 +72,25 @@ def randomsearch(s0,listaCNF):
     candidato = s0
     melhorEnergia = energia(candidato,listaCNF)
     melhorCandidato = candidato
+    lista = [melhorEnergia]
     while(cont < N):
         candidato = vizinho(candidato)
         vizinhoE = energia(candidato,listaCNF)
+        lista.append(vizinhoE)
         if(melhorEnergia < vizinhoE):
             melhorCandidato = candidato
             melhorEnergia = vizinhoE
         cont += 1
+    if not (cont < N):
+        listaRSItens.append(lista)
     return melhorEnergia
 
 def simuAnne(s0,listaCNF):
     candidato = s0
     t = T0
     cont = 1
+    e = energia(s0,listaCNF)
+    lista = [e]
     while(True):
         proximo = vizinho(candidato)
         deltaE = energia(proximo,listaCNF) - energia(candidato,listaCNF)
@@ -83,7 +100,9 @@ def simuAnne(s0,listaCNF):
             candidato = proximo
         t = temperatura(cont)
         cont += 1
+        lista.append((energia(candidato,listaCNF)))
         if(t < TN):
+            listaSAItens.append(lista)
             return candidato
 
 def media_dp(lista):
@@ -92,43 +111,32 @@ def media_dp(lista):
     for cada in lista:
         media += (cada[1] - cada[0])/len(lista)
         dp += ((cada[1] - cada[0])**2)/len(lista)
-    
+
     dp = math.sqrt(dp)
 
     return (media,dp)
 
-
-def threads(listaCNF,id):
-    global num_thread
-    global listaRandomsearch
-    global lisatSA
-    print "Thread {} Iniciou!\n".format(id)
-    inicial = gerarRandomList(TAM)
-    print "Inical da Thread {} Terminou!\n".format(id)
-    listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
-    print "RS da Thread {} Terminou!\n".format(id)
-    lisatSA.append(( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) ))
-    num_thread -= 1
-    print "Thread {} Finalizou!\n".format(id)
-
-
 listaCNF = ler()
 
-for i in range(10):
-    start_new_thread(threads,(listaCNF,i,))
-    #Cria uma tupla com os valores do inicial e do final
+for i in range(1):
+    print "{} Iniciou!\n".format(i)
+    inicial = gerarRandomList(TAM)
+    print "Inical da {} Terminou!\n".format(i)
+    listaRandomsearch.append((energia(inicial,listaCNF),randomsearch(inicial,listaCNF)))
+    print "RS da {} Terminou!\n".format(i)
+    lisatSA.append(( energia(inicial,listaCNF) , energia(simuAnne(inicial,listaCNF),listaCNF) ))
+    print "{} Finalizou!\n".format(i)
 
-while num_thread > 0:
-    pass
+    print "##### RANDOM SEARCH #####"
+    print listaRandomsearch
 
-print "##### RANDOM SEARCH #####"
-print listaRandomsearch
+    print "##### SIMULATED ANNELING #####"
+    print lisatSA
 
-print "##### SIMULATED ANNELING #####"
-print lisatSA
+    print "##### MEDIA e DP  RANDOM SEARCH #####"
+    print media_dp(listaRandomsearch)
 
-print "##### MEDIA e DP  RANDOM SEARCH #####"
-print media_dp(listaRandomsearch)
+    print "##### MEDIA e DP  SIMULATED ANNELING #####"
+    print media_dp(lisatSA)
 
-print "##### MEDIA e DP  SIMULATED ANNELING #####"
-print media_dp(lisatSA)
+    
