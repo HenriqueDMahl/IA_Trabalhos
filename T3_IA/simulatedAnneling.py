@@ -8,7 +8,7 @@ import re
 TAM = 20
 N = 250000
 T0 = 50000
-TN = 17
+TN = 0.1
 listaRSItens = []
 listaSAItens = []
 listaRandomsearch = []
@@ -54,7 +54,7 @@ def energia(inicial,listaCNF):
     return contGeral
 
 def temperatura(i):
-    return T0*(TN/float(T0))**(i/float(N))
+    return T0*((TN/float(T0))**(i/float(N)))
 
 def vizinho(lista):
     x = randrange(len(lista))
@@ -95,11 +95,13 @@ def simuAnne(s0,listaCNF):
     lista = [e]
     while(True):
         proximo = vizinho(candidato)
-        deltaE = energia(proximo,listaCNF) - energia(candidato,listaCNF)
-        if(deltaE >= 0):
+        deltaE = energia(candidato,listaCNF) - energia(proximo,listaCNF)
+
+        if(deltaE <= 0):
             candidato = proximo
-        elif randrange(0,99) < math.e ** (-deltaE/t):
+        elif random() + float(randrange(0, 99)) < math.e ** (-deltaE/float(t)):
             candidato = proximo
+
         t = temperatura(cont)
         cont += 1
         lista.append((energia(candidato,listaCNF)))
@@ -141,4 +143,4 @@ for i in range(1):
     print "##### MEDIA e DP  SIMULATED ANNELING #####"
     print media_dp(listaSAItens)
 
-    plotGraph(listaRSItens,'TESTE')
+    plotGraph(listaSAItens[0],'TESTE')
